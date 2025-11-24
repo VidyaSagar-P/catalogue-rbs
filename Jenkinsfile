@@ -1,7 +1,8 @@
 pipeline {
-    agent {
-        label AGENT-1
-    }
+    agent any
+    // {
+    //     label AGENT-1
+    // }
     environment {
         appVersion = ''
         REGION = 'us-east-1'
