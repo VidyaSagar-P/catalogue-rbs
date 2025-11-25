@@ -63,18 +63,18 @@ pipeline {
             }
         }
         stage('Trigger deploy') {
-            when{
+            when {
                 expression { params.deploy }
             }
             steps {
                 script {
-                    build job: 'catalogue-cd'
-                    parameters: [
-                        string(name: 'appVesrion', value: "${appVersion}"),
-                        string(name: 'deploy_to', value: 'dev')
-                    ],
-                    propagate: false,  // even SG fails VPC will not be effected
-                    wait: false // VPC will not wait for SG pipeline completion
+                    build job: 'catalogue-cd',
+                          parameters: [
+                              string(name: 'appVersion', value: "${env.APP_VERSION}"),
+                              string(name: 'deploy_to', value: 'dev')
+                          ],
+                          propagate: false,
+                          wait: false
                 }
             }
         }
