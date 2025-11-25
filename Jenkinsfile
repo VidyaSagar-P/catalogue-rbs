@@ -14,6 +14,9 @@ pipeline {
         timeout(time: 30, unit: 'MINUTES')
         disableConcurrentBuilds()
     }
+    parameters {
+        booleanParam(name: 'deploy', defaultValue: false, description: 'Toggle this value')
+    }
 
     // Build
     stages {
@@ -59,6 +62,34 @@ pipeline {
                 }
             }
         }
+        stage('Trigger deploy') {
+            when{
+                expression { params.deploy }
+            }
+            steps {
+                script {
+                    build job: 'catalogue-cd'
+                    parameters: [
+                        string(name: 'appVesrion', value: "${appVersion}"),
+                        string(name: 'deploy_to', value: 'dev')
+                    ],
+                    propagate: false,  // even SG fails VPC will not be effected
+                    wait: false // VPC will not wait for SG pipeline completion
+                }
+            }
+        }
+        post { 
+        always { 
+            echo 'I will always say Hello again!'
+            deleteDir()
+        }
+        success { 
+            echo 'Hello Success'
+        }
+        failure { 
+            echo 'Hello Failure'
+        }
+    }
 
     }
 
