@@ -62,33 +62,51 @@ pipeline {
             }
         }
         stage('Trigger deploy') {
-            when{
+            when {
                 expression { params.deploy }
             }
             steps {
                 script {
-                    build job: 'catalogue-cd'
-                        parameters: [
-                            string(name: 'appVesrion', value: "${appVersion}"),
-                            string(name: 'deploy_to', value: 'dev')
-                        ],
-                    propagate: false,  // even SG fails VPC will not be effected
-                    wait: false // VPC will not wait for SG pipeline completion
+                    // trigger downstream job with parameters; correct argument form
+                    build job: 'catalogue-cd',
+                          parameters: [
+                              string(name: 'appVersion', value: "${env.APP_VERSION}"),
+                              string(name: 'deploy_to', value: 'dev')
+                          ],
+                          propagate: false,
+                          wait: false
                 }
             }
         }
-    }
-        post { 
-            always { 
-                echo 'I will always say Hello again!'
-                deleteDir()
-            }
-            success { 
-                echo 'Hello Success'
-            }
-            failure { 
-                echo 'Hello Failure'
-            }
+    } // end stages
+        // stage('Trigger deploy') {
+        //     when{
+        //         expression { params.deploy }
+        //     }
+        //     steps {
+        //         script {
+        //             build job: 'catalogue-cd'
+        //                 parameters: [
+        //                     string(name: 'appVesrion', value: "${appVersion}"),
+        //                     string(name: 'deploy_to', value: 'dev')
+        //                 ],
+        //             propagate: false,  // even SG fails VPC will not be effected
+        //             wait: false // VPC will not wait for SG pipeline completion
+        //         }
+        //     }
+        // }
+    // }
+    post { 
+        always { 
+            echo 'I will always say Hello again!'
+            deleteDir()
         }
+        success { 
+            echo 'Hello Success'
+        }
+        failure { 
+            echo 'Hello Failure'
+        }
+    }
 
 }
