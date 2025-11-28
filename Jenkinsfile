@@ -59,6 +59,18 @@ pipeline {
                 }
             }
         }
+        stage('Quality Gate') {
+            steps {
+                timeout(time: 5, unit: 'MINUTES') {
+                    script {
+                        def qg = waitForQualityGate()
+                        if (qg.status != 'OK') {
+                            error "Pipeline aborted because Quality Gate failed: ${qg.status}"
+                        }
+                    }
+                }
+            }
+        }
         // copy the steps from aws ECR
         stage('Push image to ECR') {
             steps {
@@ -91,24 +103,7 @@ pipeline {
                 }
             }
         }
-    } // end stages
-        // stage('Trigger deploy') {
-        //     when{
-        //         expression { params.deploy }
-        //     }
-        //     steps {
-        //         script {
-        //             build job: 'catalogue-cd'
-        //                 parameters: [
-        //                     string(name: 'appVesrion', value: "${appVersion}"),
-        //                     string(name: 'deploy_to', value: 'dev')
-        //                 ],
-        //             propagate: false,  // even SG fails VPC will not be effected
-        //             wait: false // VPC will not wait for SG pipeline completion
-        //         }
-        //     }
-        // }
-    // }
+    } 
     post { 
         always { 
             echo 'I will always say Hello again!'
