@@ -77,15 +77,24 @@ pipeline {
             }
             steps {
                 script {
+                    withCredentials([string(credentials: 'github-token', variable: 'GITHUB_TOKEN')]) {
+                    // Groovy will NOT interpolate $GITHUB_TOKEN here; the shell will expand it at runtime
+                        sh '''
+                        curl -s -H "Accept: application/vnd.github+json" \
+                            -H "Authorization: token $GITHUB_TOKEN" \
+                            "https://api.github.com/repos/VidyaSagar-P/catalogue-rbs/dependabot/alerts"
+                        '''
+                    }
+
                     // Fetch alerts from GitHub
-                    def response = sh(
-                        script: """
-                            curl -s -H "Accept: application/vnd.github+json" \
-                                 -H "Authorization: token ${GITHUB_TOKEN}" \
-                                 https://api.github.com/repos/VidyaSagar-P/catalogue-rbs/dependabot/alerts
-                        """,
-                        returnStdout: true
-                    ).trim()
+                    // def response = sh(
+                    //     script: """
+                    //         curl -s -H "Accept: application/vnd.github+json" \
+                    //              -H "Authorization: token ${GITHUB_TOKEN}" \
+                    //              https://api.github.com/repos/VidyaSagar-P/catalogue-rbs/dependabot/alerts
+                    //     """,
+                    //     returnStdout: true
+                    // ).trim()
 
                     // Parse JSON
                     def json = readJSON text: response
