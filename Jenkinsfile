@@ -103,7 +103,7 @@ pipeline {
                 }
             }
         }
-    } 
+    } //stages ended
     post { 
         always { 
             echo 'I will always say Hello again!'
